@@ -200,7 +200,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "n2_rust-minesweeper"
+name = "n2_rust-hexagon-minesweeper"
 version = "0.1.0"
 dependencies = [
  "macroquad",
