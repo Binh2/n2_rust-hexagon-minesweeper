@@ -1,6 +1,12 @@
 # Introduction
 
-A simple Rust Minesweeper game
+A simple Rust Minesweeper game, but the square is now hexagon :)
+
+## Features
+
+* Display cell/number/bomb
+* Check win/lose
+* Detect mouse event
 
 # How to run this project locally
 ## Linux
