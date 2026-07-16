@@ -6,3 +6,11 @@ edition = "2024"
 [dependencies]
 macroquad = "0.4"
 rand = "0.9"
+
+[[bin]]
+name = "gen_img"
+path = "src/gen_img.rs"
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
