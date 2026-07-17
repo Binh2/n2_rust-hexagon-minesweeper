@@ -2,6 +2,7 @@ use macroquad::{color, prelude::*};
 use macroquad::rand;
 mod global;
 
+
 #[derive(Clone)]
 enum Cell {
     Bomb(bool),

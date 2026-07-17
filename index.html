@@ -16,10 +16,18 @@
     <canvas id="glcanvas" tabindex="1"></canvas>
     
     <!-- Load the official Macroquad / Miniquad loader script -->
-    <script src="https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js"></script>
+    <!-- <script src="https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js"></script> -->
+    <script src="/static/mq_js_bundle.js"></script>
+    <script>
+        // Intercept and kill the right-click menu globally across the whole page
+        window.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        }, false);
+    </script>
+
     <script>
         // Points directly to the file we will build next
-        load("main.wasm");
+        load("static/main.wasm");
     </script>
 </body>
 </html>
