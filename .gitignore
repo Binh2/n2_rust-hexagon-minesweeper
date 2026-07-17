@@ -1,3 +1,6 @@
 /target
 assets/generated/*
 !assets/generated/.gitkeep
+
+assets/copied/*
+!assets/copied/.gitkeep

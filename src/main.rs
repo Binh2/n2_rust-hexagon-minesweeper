@@ -162,19 +162,28 @@ async fn main() {
     let max_col = 8;
     let mut num_of_bomb = 16;
 
+    let cell_size = global::CELL_SIZE * global::SCALE;
+    let cell_border = global::CELL_BORDER * global::SCALE;
+    let cell_width = global::CELL_WIDTH * global::SCALE;
+    let cell_height = global::CELL_HEIGHT * global::SCALE;
+    // let bomb_size = global::BOMB_SIZE * global::SCALE;
+    // let font_size = global::FONT_SIZE * global::SCALE;
+
     let mut grid: Vec<Vec<Cell>> = vec![vec![Cell::Num(false, 0); max_col]; max_row];
     add_bomb(&mut grid, max_row, max_col, &mut num_of_bomb);
     update_neighbor(&mut grid, max_row, max_col);
-    let x_offset = global::CELL_SIZE * 3.0_f32.sqrt()/2.0 + global::CELL_BORDER;
-    let y_offset = global::CELL_SIZE + global::CELL_BORDER;
+    let x_texture_offset =  -cell_width/2.0;
+    let y_texture_offset = -cell_height/2.0;
+    let x_offset = cell_size * 3.0_f32.sqrt()/2.0 + cell_border;
+    let y_offset = cell_size + cell_border;
     let mut collision_map: Vec<Vec<Hexagon>> = vec![];
 
     for i in 0..max_row {
         collision_map.push(vec![]);
         for j in 0..max_col {
-            let x = ((j) as f32) * global::CELL_SIZE * 3.0_f32.sqrt() + j as f32 * global::CELL_BORDER + ((i % 2 == 1) as i32 as f32) * (global::CELL_SIZE + global::CELL_BORDER/2.0) * 3.0_f32.sqrt() / 2.0 + x_offset;
-            let y = ((i) as f32) * global::CELL_SIZE * 3.0/2.0        + i as f32 * global::CELL_BORDER + y_offset;
-            collision_map[i].push(Hexagon { x, y, size: global::CELL_SIZE, border: global::CELL_BORDER });
+            let x = ((j) as f32) * cell_size * 3.0_f32.sqrt() + j as f32 * cell_border + ((i % 2 == 1) as i32 as f32) * (cell_size + cell_border/2.0) * 3.0_f32.sqrt() / 2.0 + x_offset;
+            let y = ((i) as f32) * cell_size * 3.0/2.0        + i as f32 * cell_border + y_offset;
+            collision_map[i].push(Hexagon { x, y, size: cell_size, border: cell_border });
         }
     }
 
@@ -182,7 +191,9 @@ async fn main() {
     let cell_texture = load_texture("assets/cell.png").await.expect("Failed to load texture");
     let clicked_cell_texture = load_texture("assets/clicked_cell.png").await.expect("Failed to load texture");
     let bomb_texture = load_texture("assets/bomb.png").await.expect("Failed to load texture");
+    let wrong_bomb_texture = load_texture("assets/wrong_bomb.png").await.expect("Failed to load texture");
     let flag_texture = load_texture("assets/flag.png").await.expect("Failed to load texture");
+    let wrong_flag_texture = load_texture("assets/wrong_flag.png").await.expect("Failed to load texture");
     let num_texture = [
         load_texture("assets/1.png").await.expect("Failed to load texture"),
         load_texture("assets/2.png").await.expect("Failed to load texture"),
@@ -191,75 +202,126 @@ async fn main() {
         load_texture("assets/5.png").await.expect("Failed to load texture"),
         load_texture("assets/6.png").await.expect("Failed to load texture"),
     ];
+
+    // For winners
     let mut is_visited_grid: Vec<Vec<bool>> = vec![vec![false; max_col]; max_row];
     let mut is_visited_count: usize = 0;
-
     let mut correct_flags_count: usize = 0;
-    let mut is_lose = false;
+    let mut is_win =  false;
 
+    // For losers
+    let mut is_lose = false;
+    let mut bomb_clicked_i: Option<usize> = None;
+    let mut bomb_clicked_j: Option<usize> = None; 
+    
     loop {
         clear_background(color::BEIGE);
 
         for i in 0..max_row {
             for j in 0..max_col {
-                let x = collision_map[i][j].x;
-                let y = collision_map[i][j].y;
+                let x = collision_map[i][j].x + x_texture_offset;
+                let y = collision_map[i][j].y + y_texture_offset;
                 let is_hovering = collision_map[i][j].contains_point(mouse_position());
-                if is_hovering && is_mouse_button_pressed(MouseButton::Right) { 
-                    grid[i][j].flip_show_flag(); 
-                    if grid[i][j].is_bomb() {
-                        if grid[i][j].get_show_flag() {
-                            correct_flags_count += 1;
-                        } else {
-                            correct_flags_count -= 1;
-                        };
-                    }
-                };
-                if is_hovering && is_mouse_button_pressed(MouseButton::Left) { 
-                    if !grid[i][j].get_show_flag() { visit(&mut grid, &mut is_visited_grid, &mut is_visited_count, i, j, max_row, max_col); };
-                };
                 
-                // // draw_texture_ex(&hexagon_texture, x-16.0, y-16.0, WHITE, DrawTextureParams { dest_size: Some(vec2(32.0, 32.0)), ..Default::default() });
-                if is_visited_grid[i][j] { draw_texture(&clicked_cell_texture, x-32.0, y-32.0, WHITE); }
-                else { draw_texture(&cell_texture, x-32.0, y-32.0, WHITE); };
+                if !is_win && !is_lose {
+                    if is_hovering && is_mouse_button_pressed(MouseButton::Right) { 
+                        grid[i][j].flip_show_flag(); 
+                        if grid[i][j].is_bomb() {
+                            if grid[i][j].get_show_flag() {
+                                correct_flags_count += 1;
+                            } else {
+                                correct_flags_count -= 1;
+                            };
+                        }
+                    };
+                    if is_hovering && is_mouse_button_pressed(MouseButton::Left) { 
+                        if !grid[i][j].get_show_flag() { 
+                            if grid[i][j].is_bomb() {
+                                is_lose = true;
+                                bomb_clicked_i = Some(i);
+                                bomb_clicked_j = Some(j);
+                            } else {
+                                visit(&mut grid, &mut is_visited_grid, &mut is_visited_count, i, j, max_row, max_col); 
+                            }
+                        };
+                    };
+                    
+                    if is_visited_grid[i][j] { 
+                        draw_texture_ex(&clicked_cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); 
+                    }
+                    else { 
+                        draw_texture_ex(&cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    };
+                    
+                    if grid[i][j].get_show_flag() { 
+                        draw_texture_ex(&flag_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                        
+                        // draw_texture(&flag_texture, x-32.0, y-32.0, WHITE); 
+                    };
+                    
+                    // if grid[i][j].is_bomb() {
+                        //     draw_texture_ex(&bomb_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    //     // draw_texture(&bomb_texture, x-32.0, y-32.0, WHITE);
+                    // }
+                    let num = grid[i][j].get_num();
+                    if num != 0 && is_visited_grid[i][j] {
+                        draw_texture_ex(&num_texture[(num-1) as usize], x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    };
+                    reset_grid_button.draw();
 
-                if grid[i][j].get_show_flag() { draw_texture(&flag_texture, x-32.0, y-32.0, WHITE); };
-
-                if grid[i][j].is_bomb() {
-                    draw_texture(&bomb_texture, x-32.0, y-32.0, WHITE);
+                    is_win = is_visited_count + correct_flags_count == max_row * max_col || 
+                        is_visited_count + num_of_bomb as usize == max_row * max_col;
+                    // println!("is_visited_count {} correct_flags_count {} num_of_bomb {}", is_visited_count, correct_flags_count, num_of_bomb);
                 }
-                let num = grid[i][j].get_num();
-                // if num != 0 && is_visited_grid[i][j] {
-                //     draw_texture(&num_texture[(num-1) as usize], x-32.0, y-32.0, WHITE);
-                // }
-                if num != 0 { draw_texture(&num_texture[(num-1) as usize], x-32.0, y-32.0, WHITE); };
-
-                reset_grid_button.draw();
-
+                
                 // Check win/lose
-                if is_visited_count + correct_flags_count == max_row * max_col || 
-                is_visited_count + num_of_bomb as usize == max_row * max_col 
-                { draw_text("You win!", 500.0, 500.0, 200.0, RED); };
-                if is_lose { draw_text("You lose!", 500.0, 500.0, 200.0, RED); };
+                else if is_win { 
+                    if grid[i][j].is_bomb() { draw_texture_ex(&cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); }
+                    else { draw_texture_ex(&clicked_cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); }; 
+                    let num = grid[i][j].get_num();
+                    if num != 0 { draw_texture_ex(&num_texture[(num-1) as usize], x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); }
+                    if grid[i][j].is_bomb() { draw_texture_ex(&flag_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); };
+                    draw_text("You win!", 500.0, 500.0, 200.0, RED); 
+                }
+                else { // Lose 
+                    if (grid[i][j].is_bomb() && !grid[i][j].get_show_flag()) || is_visited_grid[i][j] {
+                        draw_texture_ex(&clicked_cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    } else {
+                        draw_texture_ex(&cell_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    };
+
+                    if grid[i][j].is_bomb() { 
+                        if bomb_clicked_i == Some(i) && bomb_clicked_j == Some(j) { 
+                            draw_texture_ex(&wrong_bomb_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() }); 
+                        } else if !grid[i][j].get_show_flag() {
+                            draw_texture_ex(&bomb_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                        }
+                    };
+
+                    if grid[i][j].get_show_flag() {
+                        if grid[i][j].is_bomb() {
+                            draw_texture_ex(&flag_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });                        
+                        } else {
+                            draw_texture_ex(&wrong_flag_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });                        
+                        }
+                    }
+
+                    
+                    let num = grid[i][j].get_num();
+                    if num != 0 && is_visited_grid[i][j] {
+                        draw_texture_ex(&num_texture[(num-1) as usize], x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
+                    };
+                    draw_text("You lose!", 500.0, 500.0, 200.0, RED); 
+                };
                 
             }
             
         }
-        if is_mouse_button_pressed(MouseButton::Left) && reset_grid_button.contains_point(mouse_position()) { reset_grid(&mut grid, &mut is_visited_grid, &mut is_visited_count, &mut correct_flags_count, &mut is_lose, max_row, max_col, &mut num_of_bomb); };
-
-        // if is_key_pressed(KeyCode::D) {
-        //     debug_vec.sort_by(|a, b| {
-        //         a.0.cmp(&b.0).then_with(|| a.1.cmp(&b.1))
-        //     });
-            
-        //     for k in 0..debug_vec.len() {
-        //         print!("({} {}), ", debug_vec[k].0, debug_vec[k].1);
-        //     }
-        //     println!();
-        //     println!("Debug_len {} is_visited_count {}", debug_vec.len(), is_visited_count);
-        // }
+        if is_mouse_button_pressed(MouseButton::Left) && reset_grid_button.contains_point(mouse_position()) ||
+        is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::R) { reset_grid(&mut grid, &mut is_visited_grid, &mut is_visited_count, &mut correct_flags_count, &mut is_lose, max_row, max_col, &mut num_of_bomb); };
 
         next_frame().await
     }
 
 }
+
