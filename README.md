@@ -8,6 +8,14 @@ A simple Rust Minesweeper game, but the square is now hexagon :)
 * Check win/lose
 * Detect mouse event
 
+## Future features (If I decided to do this project again)
+
+1. Redesign the reset button
+2. A timer: So I can time myself
+3. Mouse event recorder: So I can playback how fast I was winning.
+4. Show the leftover amount of bomb
+5. Simple database of the best player
+
 # How to run this project locally
 ## Linux
 ### Ubuntu system dependencies
@@ -33,7 +41,8 @@ Go to [https://github.com/not-fl3/macroquad](https://github.com/not-fl3/macroqua
 
 ## Finally
 
-`cargo run` to run the project
+`cargo run --bin main` to run the project
+`cargo run --bin gen_img` to generate images of the assets
 
 # What I learned
 

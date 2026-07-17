@@ -1,0 +1,45 @@
+name: Deploy Macroquad Web Build
+
+on:
+  push:
+    branches: [ "main" ] # Runs every time you push to the main branch
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Clear and Optimize Cargo Cache
+        uses: swatinem/rust-cache@v2
+
+      - name: Build WebAssembly Binary
+        run: cargo build --target wasm32-unknown-unknown --release --bin main
+
+      - name: Prepare Static Assets Folder
+        run: |
+          # Copy the compiled .wasm file directly into the static asset folder
+          cp target/wasm32-unknown-unknown/release/*.wasm ./static/
+
+      - name: Setup GitHub Pages Environment
+        uses: actions/configure-pages@v4
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './static' # Uploads the folder containing index.html, JS, and WASM
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
