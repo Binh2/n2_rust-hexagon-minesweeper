@@ -26,6 +26,16 @@
     </script>
 
     <script>
+    (function() {
+        const testing_canvas = document.createElement('canvas');
+        const testing_gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!testing_gl) {
+            alert('WebGL is not supported or is disabled in your browser. Please install/enable it to see my amazing game.');
+        }
+    })();
+    </script>
+
+    <script>
         // Points directly to the file we will build next
         load("static/main.wasm");
     </script>
