@@ -4,6 +4,9 @@ A simple Rust Minesweeper game, but the square is now hexagon :).
 
 I stopped here because it's not the that hard, unless I want to make a 12 neighbor hexagon minesweeper. And I don't think I learn anything more, unless I delve into the algorithm side of this project.
 
+## Demo
+
+
 ## Features
 
 * Display cell/number/bomb
