@@ -17,6 +17,9 @@ I stopped here because it's not the that hard, unless I want to make a 12 neighb
 3. Mouse event recorder: So I can playback how fast I was winning.
 4. Show the leftover amount of bomb
 5. Simple database of the best player
+6. Make a 12-neighbor hexagon minesweeper
+7. Run a algorithm to solve it
+8. Rate difficulty.
 
 # How to run this project locally
 ## Linux
