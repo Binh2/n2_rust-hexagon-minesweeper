@@ -6,6 +6,13 @@ I stopped here because it's not the that hard, unless I want to make a 12 neighb
 
 ## Demo
 
+Check out my website at [https://binh2.github.io/n2_rust-hexagon-minesweeper/](https://binh2.github.io/n2_rust-hexagon-minesweeper/)
+
+Screenshot of the demo website: 
+
+![Screenshot of how normal gameplay looks like](https://github.com/Binh2/n2_rust-hexagon-minesweeper/blob/main/demo-normal.png?raw=true "Normal")
+![Screenshot of when you win the game](https://github.com/Binh2/n2_rust-hexagon-minesweeper/blob/main/demo-win.png?raw=true "Win")
+![Screenshot of when you lose the game](https://github.com/Binh2/n2_rust-hexagon-minesweeper/blob/main/demo-lose.png?raw=true "Lose")
 
 ## Features
 
