@@ -255,14 +255,8 @@ async fn main() {
                     
                     if grid[i][j].get_show_flag() { 
                         draw_texture_ex(&flag_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
-                        
-                        // draw_texture(&flag_texture, x-32.0, y-32.0, WHITE); 
                     };
                     
-                    // if grid[i][j].is_bomb() {
-                        //     draw_texture_ex(&bomb_texture, x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
-                    //     // draw_texture(&bomb_texture, x-32.0, y-32.0, WHITE);
-                    // }
                     let num = grid[i][j].get_num();
                     if num != 0 && is_visited_grid[i][j] {
                         draw_texture_ex(&num_texture[(num-1) as usize], x, y, WHITE, DrawTextureParams { dest_size: Some(vec2(cell_width, cell_height)), ..Default::default() });
@@ -271,7 +265,6 @@ async fn main() {
 
                     is_win = is_visited_count + correct_flags_count == max_row * max_col || 
                         is_visited_count + num_of_bomb as usize == max_row * max_col;
-                    // println!("is_visited_count {} correct_flags_count {} num_of_bomb {}", is_visited_count, correct_flags_count, num_of_bomb);
                 }
                 
                 // Check win/lose

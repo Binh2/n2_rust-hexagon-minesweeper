@@ -1,6 +1,8 @@
 # Introduction
 
-A simple Rust Minesweeper game, but the square is now hexagon :)
+A simple Rust Minesweeper game, but the square is now hexagon :).
+
+I stopped here because it's not the that hard, unless I want to make a 12 neighbor hexagon minesweeper. And I don't think I learn anything more, unless I delve into the algorithm side of this project.
 
 ## Features
 
@@ -46,7 +48,7 @@ Go to [https://github.com/not-fl3/macroquad](https://github.com/not-fl3/macroqua
 
 # What I learned
 
-...
+Not much. Just struggling with some of the boolean operations.
 
 # Technologies used
 
