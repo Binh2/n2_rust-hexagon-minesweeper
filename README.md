@@ -70,7 +70,7 @@ Not much. Just struggling with some of the boolean operations.
 
 # Time to complete
 
-Who knows
+3 days
 
 # Contributors
 
