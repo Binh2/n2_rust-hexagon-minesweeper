@@ -54,10 +54,14 @@ Also cross-compilation to windows from linux is supported:
 ## If it doesn't work
 Go to [https://github.com/not-fl3/macroquad](https://github.com/not-fl3/macroquad)
 
-## Finally
+## To display the game
 
 `cargo run --bin main` to run the project
 `cargo run --bin gen_img` to generate images of the assets
+
+## To display the game in a browser
+
+`basic-http-server .` to run the project on the web
 
 # What I learned
 
