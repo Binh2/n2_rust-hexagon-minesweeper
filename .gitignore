@@ -4,3 +4,5 @@ assets/generated/*
 
 assets/copied/*
 !assets/copied/.gitkeep
+
+/dist
